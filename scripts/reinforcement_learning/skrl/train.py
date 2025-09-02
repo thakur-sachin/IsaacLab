@@ -14,7 +14,7 @@ a more user-friendly way.
 
 import argparse
 import sys
-
+import file_tracker
 from isaaclab.app import AppLauncher
 
 # add argparse arguments
@@ -197,7 +197,17 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
 
 if __name__ == "__main__":
+    print('1')
+    file_tracker.start_tracing()
+    print('2')
     # run the main function
     main()
     # close sim app
+    print('3')
+    used_files = file_tracker.stop_tracing()
+    print("\n--- Files used during execution ---")
+    for f in used_files:
+        print(f)
     simulation_app.close()
+    print('4')
+    
