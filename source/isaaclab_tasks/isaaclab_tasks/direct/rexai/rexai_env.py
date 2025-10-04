@@ -5,6 +5,8 @@
 
 from __future__ import annotations
 
+import gymnasium as gym
+import numpy as np
 from isaaclab_assets import REXAI_CFG
 
 import isaaclab.sim as sim_utils
@@ -24,9 +26,13 @@ class RexAIEnvCfg(DirectRLEnvCfg):
     episode_length_s = 15.0
     decimation = 2
     action_scale = 1.0
-    action_space = 21
-    observation_space = 75
+    num_actions = 10
+    num_observations = 75
     state_space = 0
+
+    # Define the actual gym spaces
+    action_space = gym.spaces.Box(low=-1.0, high=1.0, shape=(10,), dtype=np.float32)  # Changed to 10
+    observation_space = gym.spaces.Box(low=-np.inf, high=np.inf, shape=(75,), dtype=np.float32)
 
     # simulation
     sim: SimulationCfg = SimulationCfg(dt=1 / 120, render_interval=decimation)
