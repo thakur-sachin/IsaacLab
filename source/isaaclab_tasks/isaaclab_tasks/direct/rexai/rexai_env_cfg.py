@@ -3,14 +3,14 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-from __future__ import annotations
+
 from isaaclab.assets import ArticulationCfg
 from isaaclab.envs import DirectRLEnvCfg
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sim import SimulationCfg
 from isaaclab.utils import configclass
 
-
+from __future__ import annotations
 import isaaclab.sim as sim_utils
 from isaaclab.actuators import ImplicitActuatorCfg
 from isaaclab_assets import REXAI_CFG
@@ -19,7 +19,7 @@ from isaaclab_assets import REXAI_CFG
 ##
 
 @configclass
-class RexAIEnvCfg(DirectRLEnvCfg):
+class RexaiEnvCfg(DirectRLEnvCfg):
     # env
     decimation = 2
     episode_length_s = 10.0
@@ -64,6 +64,13 @@ class RexAIEnvCfg(DirectRLEnvCfg):
     angular_velocity_scale: float = 0.25
     contact_force_scale: float = 0.01
 
+# Copyright (c) 2022-2025, The Isaac Lab Project Developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+from __future__ import annotations
+
 import torch
 from collections.abc import Sequence
 
@@ -75,10 +82,10 @@ from isaaclab.utils.math import quat_rotate_inverse, sample_uniform, yaw_quat
 
 
 
-class RexAIEnv(DirectRLEnv):
-    cfg: RexAIEnvCfg
+class RexaiEnv(DirectRLEnv):
+    cfg: RexaiEnvCfg
 
-    def __init__(self, cfg: RexAIEnvCfg, render_mode: str | None = None, **kwargs):
+    def __init__(self, cfg: RexaiEnvCfg, render_mode: str | None = None, **kwargs):
         super().__init__(cfg, render_mode, **kwargs)
 
         # Get joint indices for all actuated joints
