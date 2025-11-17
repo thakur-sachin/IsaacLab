@@ -125,11 +125,11 @@ class RexAIEnvCfg(DirectRLEnvCfg):
     # Robot
     robot: ArticulationCfg = REXAI_CFG.replace(prim_path="/World/envs/env_.*/Robot")
 
-    # Contact sensor for feet
+    # Contact sensor for all bodies (will filter for feet in environment code)
     contact_sensor: ContactSensorCfg = ContactSensorCfg(
-        prim_path="/World/envs/env_.*/Robot/.*feet.*",
+        prim_path="/World/envs/env_.*/Robot/.*",
         history_length=3,
-        update_period=0.0,  # Update every step
+        update_period=0.005,
         track_air_time=True,
     )
 
