@@ -25,6 +25,7 @@ REXAI_CFG = ArticulationCfg(
         merge_fixed_joints=True,
         force_usd_conversion=False,
         make_instanceable=True,
+        joint_drive=None,  # We handle actuators through ArticulationCfg.actuators
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
             max_depenetration_velocity=10.0,
