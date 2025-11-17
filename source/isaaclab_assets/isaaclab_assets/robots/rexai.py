@@ -17,15 +17,9 @@ from isaaclab.assets import ArticulationCfg
 
 REXAI_CFG = ArticulationCfg(
     prim_path="{ENV_REGEX_NS}/Robot",
-    spawn=sim_utils.UrdfFileCfg(
-        asset_path=f"{{ISAACLAB_ASSETS_DATA_DIR}}/Robots/RexAI/Assets/Trex/Trex.urdf",
-        usd_dir=f"{{ISAACLAB_ASSETS_DATA_DIR}}/Robots/RexAI/Assets/Trex",
-        usd_file_name="Trex.usd",
-        fix_base=False,
-        merge_fixed_joints=True,
-        force_usd_conversion=False,
-        make_instanceable=True,
-        joint_drive=None,  # We handle actuators through ArticulationCfg.actuators
+    spawn=sim_utils.UsdFileCfg(
+        usd_path=f"/home/sachin/RexAI/Assets/Trex_usd_v2/Trex_usd_v2.usd",
+        activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
             max_depenetration_velocity=10.0,
@@ -38,6 +32,7 @@ REXAI_CFG = ArticulationCfg(
             sleep_threshold=0.005,
             stabilization_threshold=0.001,
         ),
+        copy_from_source=False,
     ),
     init_state=ArticulationCfg.InitialStateCfg(
         pos=(0.0, 0.0, 0.35),  # Spawn at 0.35m height (slightly above robot height of 0.3m)

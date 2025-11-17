@@ -59,9 +59,9 @@ class RexAIEnv(DirectRLEnv):
         }
 
         # Get contact sensor body indices
-        self._feet_ids, _ = self._contact_sensor.find_bodies(".*feet.*")
-        # Undesired contacts: base, thighs, knees
-        self._undesired_contact_body_ids, _ = self._contact_sensor.find_bodies("base_link|.*femur.*|.*tibia.*")
+        # self._feet_ids, _ = self._contact_sensor.find_bodies(".*feet.*")
+        # # Undesired contacts: base, thighs, knees
+        # self._undesired_contact_body_ids, _ = self._contact_sensor.find_bodies("base_link|.*femur.*|.*tibia.*")
 
     def _setup_scene(self):
         """Setup the scene with robot, terrain, and sensors."""
@@ -70,8 +70,8 @@ class RexAIEnv(DirectRLEnv):
         self.scene.articulations["robot"] = self._robot
 
         # Add contact sensor
-        self._contact_sensor = ContactSensor(self.cfg.contact_sensor)
-        self.scene.sensors["contact_sensor"] = self._contact_sensor
+        # self._contact_sensor = ContactSensor(self.cfg.contact_sensor)
+        # self.scene.sensors["contact_sensor"] = self._contact_sensor
 
         # Setup terrain
         self.cfg.terrain.num_envs = self.scene.cfg.num_envs
@@ -116,8 +116,8 @@ class RexAIEnv(DirectRLEnv):
         self._previous_actions = self._actions.clone()
 
         # Get feet contact information
-        feet_contact = self._contact_sensor.data.net_forces_w_history[:, :, self._feet_ids, 2].max(dim=1)[0] > 1.0
-        feet_air_time = self._contact_sensor.data.current_air_time[:, self._feet_ids]
+        # feet_contact = self._contact_sensor.data.net_forces_w_history[:, :, self._feet_ids, 2].max(dim=1)[0] > 1.0
+        # feet_air_time = self._contact_sensor.data.current_air_time[:, self._feet_ids]
 
         obs = torch.cat(
             [
@@ -128,8 +128,8 @@ class RexAIEnv(DirectRLEnv):
                 self._robot.data.joint_pos - self._robot.data.default_joint_pos,   # 10
                 self._robot.data.joint_vel,                                         # 10
                 self._previous_actions,                                              # 10
-                feet_contact.float(),                                                # 2
-                feet_air_time,                                                       # 2
+                # feet_contact.float(),                                                # 2
+                # feet_air_time,                                                       # 2
             ],
             dim=-1,
         )
@@ -177,30 +177,30 @@ class RexAIEnv(DirectRLEnv):
         )
 
         # Feet air time reward (encourage dynamic walking)
-        first_contact = self._contact_sensor.data.current_air_time[:, self._feet_ids] > 0.0
-        feet_air_time_reward = (
-            torch.sum(
-                self._contact_sensor.data.current_air_time[:, self._feet_ids] * first_contact.float(),
-                dim=1,
-            )
-            * self.cfg.feet_air_time_reward_scale
-        )
+        # first_contact = self._contact_sensor.data.current_air_time[:, self._feet_ids] > 0.0
+        # feet_air_time_reward = (
+        #     torch.sum(
+        #         self._contact_sensor.data.current_air_time[:, self._feet_ids] * first_contact.float(),
+        #         dim=1,
+        #     )
+        #     * self.cfg.feet_air_time_reward_scale
+        # )
 
         # Undesired contact penalty (body, thighs, knees shouldn't touch ground)
-        undesired_contact_penalty = (
-            torch.sum(
-                torch.any(
-                    torch.norm(
-                        self._contact_sensor.data.net_forces_w_history[:, :, self._undesired_contact_body_ids, :],
-                        dim=-1,
-                    )
-                    > 1.0,
-                    dim=1,
-                ).float(),
-                dim=1,
-            )
-            * self.cfg.undesired_contact_reward_scale
-        )
+        # undesired_contact_penalty = (
+        #     torch.sum(
+        #         torch.any(
+        #             torch.norm(
+        #                 self._contact_sensor.data.net_forces_w_history[:, :, self._undesired_contact_body_ids, :],
+        #                 dim=-1,
+        #             )
+        #             > 1.0,
+        #             dim=1,
+        #         ).float(),
+        #         dim=1,
+        #     )
+        #     * self.cfg.undesired_contact_reward_scale
+        # )
 
         # Flat orientation penalty (penalize tilting)
         flat_orientation_penalty = (
@@ -217,13 +217,13 @@ class RexAIEnv(DirectRLEnv):
         dof_pos_limits_penalty = torch.sum(dof_at_limit.float(), dim=1) * self.cfg.dof_pos_limits_reward_scale
 
         # Feet stumble penalty (feet velocity while in contact should be low)
-        feet_vel = torch.norm(self._robot.data.body_lin_vel_w[:, self._feet_ids, :2], dim=-1)
-        feet_contact = (
-            torch.norm(self._contact_sensor.data.net_forces_w[:, self._feet_ids, :], dim=-1) > 1.0
-        ).float()
-        feet_stumble_penalty = (
-            torch.sum(feet_vel * feet_contact, dim=1) * self.cfg.feet_stumble_reward_scale
-        )
+        # feet_vel = torch.norm(self._robot.data.body_lin_vel_w[:, self._feet_ids, :2], dim=-1)
+        # feet_contact = (
+        #     torch.norm(self._contact_sensor.data.net_forces_w[:, self._feet_ids, :], dim=-1) > 1.0
+        # ).float()
+        # feet_stumble_penalty = (
+        #     torch.sum(feet_vel * feet_contact, dim=1) * self.cfg.feet_stumble_reward_scale
+        # )
 
         # Total reward
         total_reward = (
@@ -234,11 +234,11 @@ class RexAIEnv(DirectRLEnv):
             + joint_torque_penalty
             + joint_accel_penalty
             + action_rate_penalty
-            + feet_air_time_reward
-            + undesired_contact_penalty
+            # + feet_air_time_reward
+            # + undesired_contact_penalty
             + flat_orientation_penalty
             + dof_pos_limits_penalty
-            + feet_stumble_penalty
+            # + feet_stumble_penalty
         )
 
         # Log episode sums
@@ -249,11 +249,11 @@ class RexAIEnv(DirectRLEnv):
         self._episode_sums["dof_torques_l2"] += joint_torque_penalty
         self._episode_sums["dof_acc_l2"] += joint_accel_penalty
         self._episode_sums["action_rate_l2"] += action_rate_penalty
-        self._episode_sums["feet_air_time"] += feet_air_time_reward
-        self._episode_sums["undesired_contacts"] += undesired_contact_penalty
+        # self._episode_sums["feet_air_time"] += feet_air_time_reward
+        # self._episode_sums["undesired_contacts"] += undesired_contact_penalty
         self._episode_sums["flat_orientation_l2"] += flat_orientation_penalty
         self._episode_sums["dof_pos_limits"] += dof_pos_limits_penalty
-        self._episode_sums["feet_stumble"] += feet_stumble_penalty
+        # self._episode_sums["feet_stumble"] += feet_stumble_penalty
 
         return total_reward
 

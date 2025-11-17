@@ -82,7 +82,7 @@ class RexAIEnvCfg(DirectRLEnvCfg):
     """Configuration for the RexAI bipedal locomotion environment."""
 
     # Environment settings
-    episode_length_s = 20.0
+    episode_length_s = 2000.0
     decimation = 4
     action_scale = 0.5
     action_space = 10  # 8 leg joints + 2 auxiliary (head, tail)
@@ -125,13 +125,13 @@ class RexAIEnvCfg(DirectRLEnvCfg):
     # Robot
     robot: ArticulationCfg = REXAI_CFG.replace(prim_path="/World/envs/env_.*/Robot")
 
-    # Contact sensor for feet
-    contact_sensor: ContactSensorCfg = ContactSensorCfg(
-        prim_path="/World/envs/env_.*/Robot/.*feet.*",
-        history_length=3,
-        update_period=0.0,  # Update every step
-        track_air_time=True,
-    )
+    # # Contact sensor for feet
+    # contact_sensor: ContactSensorCfg = ContactSensorCfg(
+    #     prim_path="/World/envs/env_.*/Robot/.*feet.*",
+    #     history_length=3,
+    #     update_period=0.0,  # Update every step
+    #     track_air_time=True,
+    # )
 
     # Events
     events: EventCfg = EventCfg()
@@ -151,7 +151,7 @@ class RexAIEnvCfg(DirectRLEnvCfg):
     feet_stumble_reward_scale = -0.5  # Penalize feet stumbling
 
     # Termination settings
-    termination_height = 0.2  # Terminate if base goes below 0.2m (robot is 0.3m tall)
+    termination_height = -0.1  # Terminate if base goes below 0.2m (robot is 0.3m tall)
 
     # Command settings (target velocities)
     commands_x_range = (0.5, 1.5)  # Target forward velocity range (m/s)
